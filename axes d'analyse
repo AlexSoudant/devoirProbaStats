@@ -1,0 +1,23 @@
+index 
+
+id
+
+variables discriminantes
+
+sexe (Logit 0-1 <int>)
+mino (Logit 0-1 <int>)
+
+variables de classement
+
+nais (année <int>) contient des 9999
+educ (nb année <int>)
+anc (nb mois <int>)
+csp (logit 1-2-3 <int>)
+exp (nb mois <int>)
+
+variables target
+
+salemb (quantité euros <int>)
+salac (quantité euros <int>)
+
+
