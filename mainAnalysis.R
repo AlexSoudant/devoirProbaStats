@@ -174,29 +174,106 @@ f_egalite_salaire(data.cadre,0)
 
 #_________ educ
 
+data.educ.faible = data_analysis[data_analysis['educ_qual'] == 'faible',]
+data.educ.moyen = data_analysis[data_analysis['educ_qual'] == 'moyen',]
+data.educ.fort = data_analysis[data_analysis['educ_qual'] == 'fort',]
+
+f_egalite_salaire(data.educ.faible,0)
+f_egalite_salaire(data.educ.moyen,0)
+f_egalite_salaire(data.educ.fort,0)
+
 #_________ anc
+
+data.anc.faible = data_analysis[data_analysis['anc_qual'] == 'faible',]
+data.anc.moyen = data_analysis[data_analysis['anc_qual'] == 'moyen',]
+data.anc.fort = data_analysis[data_analysis['anc_qual'] == 'fort',]
+
+f_egalite_salaire(data.anc.faible,0)
+f_egalite_salaire(data.anc.moyen,0)
+f_egalite_salaire(data.anc.fort,0)
+
 
 #_________ exp
 
+data.exp.faible = data_analysis[data_analysis['exp_qual'] == 'faible',]
+data.exp.moyen = data_analysis[data_analysis['exp_qual'] == 'moyen',]
+data.exp.fort = data_analysis[data_analysis['exp_qual'] == 'fort',]
+
+f_egalite_salaire(data.exp.faible,0)
+f_egalite_salaire(data.exp.moyen,0)
+f_egalite_salaire(data.exp.fort,0)
+
+
+#_________ age
+
+# test entre deux quantités
+mod_q1 <-  lm(data_analysis$salemb ~ data_analysis$age)
+summary(mod_q1)
+
+age2 <- data_analysis$age^2
+
+mod_q2 <-  lm(data_analysis$salemb ~ data_analysis$age + age2)
+summary(mod_q2)
 
 #__________________ Modélisation
 
 #_________ qda
 
+libray(MASS)
+
+modQuad <- qda(data_analysis$sexe_qual ~ data_analysis$salemb)
+
+predictions <- predict(modQuad,data_analysis)$class
+
+table(predictions,data_analysis$sexe_qual)
+
+score <- 1 - sum(predictions != data_analysis$sexe_qual) / nrow(data_analysis)
+score
+
 #_________ svm
+
+library(e1071)
+
+model <- svm(data_analysis$sexe_qual ~ data_analysis$salemb , data_analysis)
+ 
+predictedY <- predict(model, data_analysis)
+
+table(predictedY,data_analysis$sexe_qual)
+
+score <- 1 - sum(predictedY != data_analysis$sexe_qual) / nrow(data_analysis)
+score
 
 #_________ knn
 
+train <- data[sample(1:nrow(data_analysis), 50,replace=FALSE),]
+test <- data[sample(1:nrow(data_analysis), 20,replace=FALSE),]
+
+train <- train[,c(csp_qual,salemb, age,educ_qual,anc_qual,exp_qual)]
+
+library(kknn)
+k <- kknn(data_analysis$sexe_qual~data_analysis$salemb + data_analysis$csp_qual + data_analysis$age 
+	+ data_analysis$educ_qual + data_analysis$anc_qual + data_analysis$exp_qual ,train,test)
+summary(k)
+
+score <- 1 - sum(k$fit != data_analysis$sexe_qual) / nrow(data)
+score
+
 #_________ rpart
+
+library(rpart)
+rpartichio <- rpart(data_analysis$sexe_qual ~ .,data_analysis)
+rpartichio
 
 #_________ random forest
 
+library(randomForest)
+RFdeschio <- randomForest(data_analysis$sexe_qual ~ .,data_analysis)
+RFdeschio
+
+score <- 1 - sum(RFdeschio$predicted != data_analysis$sexe_qual) / nrow(data_analysis)
+score
 
 
-
-
-
-#_________ Salaire actuel 
 
 
 
