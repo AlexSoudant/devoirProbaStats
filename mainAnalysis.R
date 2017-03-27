@@ -273,6 +273,28 @@ RFdeschio
 score <- 1 - sum(RFdeschio$predicted != data_analysis$sexe_qual) / nrow(data_analysis)
 score
 
+#__________________ Prédiction du salaire par l'algorithme knn
+
+cible <- data_analysis$salac
+
+train <- data[sample(1:nrow(data_analysis), 50,replace=FALSE),]
+test <- data[sample(1:nrow(data_analysis), 20,replace=FALSE),]
+
+train <- train[,c(sexe_qual, csp_qual, age,educ_qual,anc_qual,exp_qual)]
+
+library(kknn)
+k <- kknn(cible~data_analysis$sexe_qual + data_analysis$csp_qual + data_analysis$age 
+	+ data_analysis$educ_qual + data_analysis$anc_qual + data_analysis$exp_qual ,train,test)
+summary(k)
+
+n <- length(data_analysis[,1])
+
+rmsle <- sqrt((1/n) * sum(log10(data_analysis$salemb + 1) - log10(k$fitted.values + 1))^2 ) 
+rmsle
+
+x <- data.frame(id, salac, k$fitted.values)
+
+write.csv(x, file = "predictions.csv", row.names = FALSE)
 
 
 
