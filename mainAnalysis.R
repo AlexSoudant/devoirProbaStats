@@ -207,7 +207,9 @@ f_egalite_salaire(data.exp.fort,0)
 #_________ age
 
 # test entre deux quantités
-mod_q1 <-  lm(data_analysis$salemb ~ data_analysis$age)
+
+age <- data_analysis$age
+mod_q1 <-  lm(data_analysis$salemb ~ age)
 summary(mod_q1)
 
 age2 <- data_analysis$age^2
@@ -219,7 +221,7 @@ summary(mod_q2)
 
 #_________ qda
 
-libray(MASS)
+library(MASS)
 
 modQuad <- qda(data_analysis$sexe_qual ~ data_analysis$salemb)
 
@@ -245,10 +247,8 @@ score
 
 #_________ knn
 
-train <- data[sample(1:nrow(data_analysis), 50,replace=FALSE),]
-test <- data[sample(1:nrow(data_analysis), 20,replace=FALSE),]
-
-train <- train[,c(csp_qual,salemb, age,educ_qual,anc_qual,exp_qual)]
+train <- data_analysis[sample(1:nrow(data_analysis), 50,replace=FALSE),]
+test <- data_analysis[sample(1:nrow(data_analysis), 20,replace=FALSE),]
 
 library(kknn)
 k <- kknn(data_analysis$sexe_qual~data_analysis$salemb + data_analysis$csp_qual + data_analysis$age 
@@ -277,10 +277,8 @@ score
 
 cible <- data_analysis$salac
 
-train <- data[sample(1:nrow(data_analysis), 50,replace=FALSE),]
-test <- data[sample(1:nrow(data_analysis), 20,replace=FALSE),]
-
-train <- train[,c(sexe_qual, csp_qual, age,educ_qual,anc_qual,exp_qual)]
+train <- data_analysis[sample(1:nrow(data_analysis), 50,replace=FALSE),]
+test <- data_analysis[sample(1:nrow(data_analysis), 20,replace=FALSE),]
 
 library(kknn)
 k <- kknn(cible~data_analysis$sexe_qual + data_analysis$csp_qual + data_analysis$age 
@@ -292,7 +290,9 @@ n <- length(data_analysis[,1])
 rmsle <- sqrt((1/n) * sum(log10(data_analysis$salemb + 1) - log10(k$fitted.values + 1))^2 ) 
 rmsle
 
-x <- data.frame(id, salac, k$fitted.values)
+predictions <- k$fitted.values
+
+x <- data.frame(id, salac, predictions)
 
 write.csv(x, file = "predictions.csv", row.names = FALSE)
 
